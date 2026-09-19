@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
 // disini http method get, menampikan hello world
 // dengan parameter name, by default adalah Ahmad
 Route::get('/hello-world', function() {
-    $name = request()->get('name') ?? 'Ahmad'; 
+   $name = request()->get('name') ?? 'Jeni'; 
 
     return response()->json([
         'message' => "Hello World, {$name}"
