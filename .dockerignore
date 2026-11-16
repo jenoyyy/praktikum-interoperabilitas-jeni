@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+node_modules
+vendor
+storage
+bootstrap/cache
+database
+tests
+resources
+public
+composer.json
+composer.lock
+README.md
+OPENAPI.md
+openapi.json

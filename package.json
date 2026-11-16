@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "start:api": "node server.js",
+    "dev:api": "node --watch server.js"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
@@ -18,7 +20,7 @@
   },
   "name": "praktikum-http",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -1,58 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Praktikum Interoperabilitas — Blog API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Project praktikum REST API menggunakan Laravel, Sanctum, OpenAPI, dan Express.js.
 
-## About Laravel
+## Fitur Laravel API
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Register, login, profile, dan logout menggunakan Laravel Sanctum.
+- BREAD Blog: Browse, Read, Edit, Add, Delete.
+- Relasi one-to-many: satu User dapat memiliki banyak Blog.
+- Setiap blog menyimpan `user_id` pemilik.
+- Token abilities: `blogs:read`, `blogs:update`, `blogs:create`, dan `blogs:delete`.
+- Pemeriksaan kepemilikan untuk detail, edit, dan hapus blog.
+- Dokumentasi kontrak OpenAPI 3.0.3 pada `openapi.json`.
+- Dokumentasi API interaktif melalui Laravel Scramble.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Persyaratan
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3 atau lebih baru.
+- Composer 2.
+- Database SQLite atau MySQL/MariaDB.
+- Node.js 24 atau lebih baru untuk Express dan Prism.
+- Docker (opsional, untuk menjalankan Express API dalam container).
 
-## Learning Laravel
+## Menjalankan Laravel API
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Checkout branch pengerjaan:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+~~~bash
+git checkout feature/complete-api-practicum
+~~~
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+2. Instal dependency:
 
-## Agentic Development
+~~~bash
+composer install
+~~~
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+3. Salin file environment. Pada Windows PowerShell:
 
-```bash
-composer require laravel/boost --dev
+~~~powershell
+Copy-Item .env.example .env
+~~~
 
-php artisan boost:install
-```
+4. Buat application key:
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+~~~bash
+php artisan key:generate
+~~~
 
-## Contributing
+5. Atur koneksi database di `.env`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Untuk SQLite, gunakan `DB_CONNECTION=sqlite`. Jika file database belum ada, buat `database/database.sqlite` terlebih dahulu. Untuk MySQL/MariaDB, isi host, port, nama database, username, dan password sesuai konfigurasi lokal.
 
-## Code of Conduct
+6. Jalankan migration dan seeder:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+~~~bash
+php artisan migrate --seed
+~~~
 
-## Security Vulnerabilities
+7. Jalankan server:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+~~~bash
+php artisan serve
+~~~
 
-## License
+Base URL API: `http://127.0.0.1:8000/api`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Dokumentasi dan pengujian Laravel
+
+- OpenAPI: lihat file [OPENAPI.md](OPENAPI.md) dan [openapi.json](openapi.json).
+- Dokumentasi interaktif Scramble: `http://127.0.0.1:8000/docs/api`.
+- Daftar route: `php artisan route:list --path=api`.
+- Jalankan test: `php artisan test`.
+
+## Menjalankan Express HTTP API
+
+Express API merupakan praktikum terpisah dari Laravel dan berjalan pada port 3000.
+
+~~~bash
+npm ci
+npm run start:api
+~~~
+
+Buka `http://localhost:3000`. Endpoint produk tersedia pada:
+
+- `GET /produk`
+- `GET /produk/:id`
+- `POST /produk`
+- `PATCH /produk/:id`
+- `DELETE /produk/:id`
+
+Data produk Express disimpan sementara di memori proses. Data akan kembali ke data awal ketika server dihentikan atau dimulai ulang.
+
+## Menjalankan Express dengan Docker
+
+~~~bash
+docker build -t praktikum-http-api .
+docker run --rm -p 3000:3000 praktikum-http-api
+~~~
+
+## Catatan keamanan
+
+Mode login `read`, `edit`, `delete`, dan `manage` dibuat untuk memperagakan token abilities sesuai alur praktikum. Untuk aplikasi produksi, pemberian abilities harus ditentukan oleh izin server-side dan kebijakan role yang tepercaya.
