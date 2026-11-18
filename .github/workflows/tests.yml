@@ -45,6 +45,43 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Prepare Laravel API database for Postman tests
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/database/database.sqlite
+        run: |
+          touch database/database.sqlite
+          php artisan key:generate --force
+          php artisan migrate --force
+
+      - name: Start Laravel API for Postman tests
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/database/database.sqlite
+        run: |
+          nohup php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-server.log 2>&1 &
+          echo $! > /tmp/laravel-server.pid
+          for attempt in $(seq 1 30); do
+            if [ "$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8000/up)" = "200" ]; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/laravel-server.log
+          exit 1
+
+      - name: Run Postman collection against Laravel API
+        run: npx --yes newman@6.2.1 run postman/Praktikum-Interoperabilitas-Blog-API.postman_collection.json --bail
+
+      - name: Stop Laravel API test server
+        if: always()
+        run: |
+          if [ -f /tmp/laravel-server.pid ]; then
+            kill "$(cat /tmp/laravel-server.pid)" || true
+          fi
+
       - name: Run Express API integration tests
         run: npm run test:api
 

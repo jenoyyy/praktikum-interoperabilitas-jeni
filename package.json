@@ -7,8 +7,8 @@
     "dev": "vite",
     "start:api": "node server.js",
     "dev:api": "node --watch server.js",
-    "test": "node --test tests/node",
-    "test:api": "node --test tests/node"
+    "test": "node --test tests/node/server.test.js tests/node/openapi.test.js",
+    "test:api": "node --test tests/node/server.test.js tests/node/openapi.test.js"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

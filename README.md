@@ -78,7 +78,36 @@ Base URL API: `http://127.0.0.1:8000/api`.
 - OpenAPI: lihat file [OPENAPI.md](OPENAPI.md) dan [openapi.json](openapi.json).
 - Dokumentasi interaktif Scramble: `http://127.0.0.1:8000/docs/api`.
 - Daftar route: `php artisan route:list --path=api`.
-- Jalankan test: `php artisan test`.
+- Jalankan test Laravel: `php artisan test`.
+
+## Pengujian otomatis Node.js dan OpenAPI
+
+Instal dependency Node.js jika belum dilakukan:
+
+~~~bash
+npm ci
+~~~
+
+Jalankan pengujian integrasi Express dan pemeriksaan kontrak OpenAPI:
+
+~~~bash
+npm test
+~~~
+
+Pengujian ini memeriksa endpoint produk Express (GET, POST, PATCH, DELETE), validasi, respons 404/409/422, serta struktur endpoint dan token abilities pada `openapi.json`.
+
+## Pengujian manual dengan Insomnia
+
+1. Pastikan Laravel berjalan pada `http://127.0.0.1:8000`, database sudah dikonfigurasi, dan migration sudah dijalankan.
+2. Impor file `insomnia/Praktikum-Interoperabilitas-Blog-API.insomnia.json` ke Insomnia melalui **Import**.
+3. Pilih environment **Local Laravel API**. Base URL sudah diatur ke `http://127.0.0.1:8000/api`.
+4. Sebelum menjalankan request, ubah `owner_email` dan `other_email` menjadi alamat email uji yang belum terdaftar. Gunakan `test_password` yang sama untuk kedua akun.
+5. Jalankan request secara berurutan sesuai grup: **01 Authentication**, **02 Blog BREAD**, **03 Owner Access Control**, lalu **04 Finish**.
+6. Setelah request login pemilik berhasil, salin nilai `token` dari respons ke environment variable `owner_token`. Setelah login pengguna kedua, salin tokennya ke `other_token`. Setelah Add Blog berhasil, salin `data.id` ke `blog_id`.
+7. Pastikan request pengguna kedua untuk membaca, mengubah, dan menghapus blog pemilik menghasilkan `403 Forbidden`.
+8. Pengujian membuat dua akun dan satu blog pada database lokal. Request terakhir menghapus blog uji dan melakukan logout akun pemilik; akun uji tetap tersimpan.
+
+File koleksi Postman lama tetap tersedia di folder `postman/` sebagai alternatif, tetapi panduan pengujian utama project ini menggunakan Insomnia.
 
 ## Menjalankan Express HTTP API
 

@@ -1,0 +1,568 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-11-17T06:00:00.000Z",
+  "__export_source": "insomnia.desktop.app",
+  "resources": [
+    {
+      "_id": "wrk_blog_api_jeni",
+      "parentId": null,
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "name": "Praktikum Interoperabilitas - Blog API",
+      "description": "Pengujian manual Laravel Blog API: autentikasi Sanctum, BREAD, token abilities, dan kepemilikan blog. Jalankan request secara berurutan.",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_blog_api_local",
+      "parentId": "wrk_blog_api_jeni",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "name": "Local Laravel API",
+      "data": {
+        "base_url": "http://127.0.0.1:8000/api",
+        "test_password": "Password123!",
+        "owner_email": "jeni.owner@example.com",
+        "other_email": "jeni.other@example.com",
+        "owner_token": "",
+        "other_token": "",
+        "blog_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "test_password",
+          "owner_email",
+          "other_email",
+          "owner_token",
+          "other_token",
+          "blog_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1,
+      "_type": "environment"
+    },
+    {
+      "_id": "fld_auth_blog",
+      "parentId": "wrk_blog_api_jeni",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "name": "01 - Authentication",
+      "description": "Daftarkan pemilik, login, lalu periksa profil.",
+      "environment": {},
+      "metaSortKey": 1000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_register_owner",
+      "parentId": "fld_auth_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/register",
+      "name": "Register owner account",
+      "description": "Ganti owner_email dengan alamat email yang belum pernah terdaftar sebelum mengirim request.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Jeni\",\n  \"email\": \"{{ _.owner_email }}\",\n  \"password\": \"{{ _.test_password }}\",\n  \"password_confirmation\": \"{{ _.test_password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_login_owner",
+      "parentId": "fld_auth_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/login",
+      "name": "Login owner with manage ability",
+      "description": "Salin token dari respons ke environment variable owner_token.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.owner_email }}\",\n  \"password\": \"{{ _.test_password }}\",\n  \"mode\": \"manage\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_profile_owner",
+      "parentId": "fld_auth_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/profile",
+      "name": "Get owner profile",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 3000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_bread_blog",
+      "parentId": "wrk_blog_api_jeni",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "name": "02 - Blog BREAD",
+      "description": "Uji Browse, Add, Read, dan Edit. Salin data.id hasil Add ke environment blog_id.",
+      "environment": {},
+      "metaSortKey": 2000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_browse_blogs",
+      "parentId": "fld_bread_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blogs",
+      "name": "B - Browse blogs",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_add_blog",
+      "parentId": "fld_bread_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blogs",
+      "name": "A - Add blog",
+      "description": "user_id sengaja dikirim dengan nilai palsu untuk memastikan server menetapkan pemilik dari token login, bukan dari input klien.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Blog Uji Insomnia\",\n  \"content\": \"Blog ini dibuat untuk menguji endpoint BREAD.\",\n  \"user_id\": 999999\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_read_blog",
+      "parentId": "fld_bread_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blog/{{ _.blog_id }}",
+      "name": "R - Read own blog",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 3000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_edit_blog",
+      "parentId": "fld_bread_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blog/{{ _.blog_id }}",
+      "name": "E - Edit own blog",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Blog Uji Insomnia - Diperbarui\",\n  \"content\": \"Konten blog sudah diperbarui melalui Insomnia.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 4000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_owner_access",
+      "parentId": "wrk_blog_api_jeni",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "name": "03 - Owner Access Control",
+      "description": "Buat pengguna kedua dan pastikan ia tidak dapat membaca, mengubah, atau menghapus blog milik pemilik pertama.",
+      "environment": {},
+      "metaSortKey": 3000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_register_other",
+      "parentId": "fld_owner_access",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/register",
+      "name": "Register second user",
+      "description": "Ganti other_email dengan alamat email berbeda yang belum pernah terdaftar.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Pengguna Lain\",\n  \"email\": \"{{ _.other_email }}\",\n  \"password\": \"{{ _.test_password }}\",\n  \"password_confirmation\": \"{{ _.test_password }}\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_login_other",
+      "parentId": "fld_owner_access",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/login",
+      "name": "Login second user",
+      "description": "Salin token dari respons ke environment variable other_token.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.other_email }}\",\n  \"password\": \"{{ _.test_password }}\",\n  \"mode\": \"manage\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_other_read",
+      "parentId": "fld_owner_access",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blog/{{ _.blog_id }}",
+      "name": "Other user cannot read owner's blog",
+      "description": "Hasil yang diharapkan: 403 Forbidden.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.other_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 3000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_other_edit",
+      "parentId": "fld_owner_access",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blog/{{ _.blog_id }}",
+      "name": "Other user cannot edit owner's blog",
+      "description": "Hasil yang diharapkan: 403 Forbidden.",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Percobaan mengubah blog orang lain\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.other_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 4000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_other_delete",
+      "parentId": "fld_owner_access",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blog/{{ _.blog_id }}",
+      "name": "Other user cannot delete owner's blog",
+      "description": "Hasil yang diharapkan: 403 Forbidden.",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.other_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 5000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_finish_blog",
+      "parentId": "wrk_blog_api_jeni",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "name": "04 - Finish",
+      "description": "Hapus blog uji dengan token pemilik dan logout.",
+      "environment": {},
+      "metaSortKey": 4000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "req_owner_delete",
+      "parentId": "fld_finish_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/blog/{{ _.blog_id }}",
+      "name": "Owner deletes own blog",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_logout_owner",
+      "parentId": "fld_finish_blog",
+      "modified": 1794910000000,
+      "created": 1794910000000,
+      "url": "{{ _.base_url }}/logout",
+      "name": "Logout owner",
+      "method": "POST",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.owner_token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    }
+  ]
+}
