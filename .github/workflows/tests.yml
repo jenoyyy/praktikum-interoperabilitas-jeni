@@ -106,3 +106,33 @@ jobs:
           done
           docker logs "$container_id"
           exit 1
+
+      - name: Validate Insomnia workspace
+        run: |
+          node --input-type=module -e 'import { readFileSync } from "node:fs"; const workspace = JSON.parse(readFileSync("insomnia/Praktikum-Interoperabilitas-Blog-API.insomnia.json", "utf8")); const requests = workspace.resources.filter((resource) => resource._type === "request"); const groups = workspace.resources.filter((resource) => resource._type === "request_group"); if (workspace.__export_format !== 4 || requests.length !== 14 || groups.length !== 4) { throw new Error("Insomnia workspace must contain format 4, 14 requests, and 4 groups."); } console.log("Insomnia workspace is valid: 14 requests in 4 groups.");'
+
+      - name: Build Laravel PHP runtime image
+        run: docker build --file Dockerfile.laravel --tag praktikum-interoperabilitas-laravel:test .
+
+      - name: Verify Laravel PHP runtime image
+        run: |
+          docker run --rm --entrypoint composer praktikum-interoperabilitas-laravel:test --version
+          docker run --rm --entrypoint php praktikum-interoperabilitas-laravel:test -r '$required = ["bcmath", "curl", "dom", "fileinfo", "intl", "mbstring", "openssl", "pdo_sqlite", "tokenizer", "xml", "zip"]; foreach ($required as $extension) { if (! extension_loaded($extension)) { fwrite(STDERR, "Missing PHP extension: {$extension}\\n"); exit(1); } } echo "Required PHP extensions are available.\\n";'
+
+      - name: Smoke test Laravel in Docker
+        run: |
+          container_id=$(docker run -d --name laravel-docker-smoke -p 127.0.0.1:8001:8000 --mount type=bind,source="$GITHUB_WORKSPACE",target=/var/www/html --workdir /var/www/html -e APP_ENV=local -e APP_DEBUG=true -e APP_URL=http://127.0.0.1:8001 -e DB_CONNECTION=sqlite -e DB_DATABASE=/tmp/laravel-docker-smoke.sqlite -e CACHE_STORE=file -e SESSION_DRIVER=file -e QUEUE_CONNECTION=sync praktikum-interoperabilitas-laravel:test sh /var/www/html/docker/laravel-entrypoint.sh)
+          trap 'docker rm -f "$container_id" >/dev/null 2>&1 || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8001/up >/dev/null; then
+              echo "Laravel Docker runtime is ready."
+              exit 0
+            fi
+            if [ "$(docker inspect --format '{{.State.Status}}' "$container_id")" != "running" ]; then
+              docker logs "$container_id"
+              exit 1
+            fi
+            sleep 2
+          done
+          docker logs "$container_id"
+          exit 1

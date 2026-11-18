@@ -6,84 +6,158 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "http://127.0.0.1:8000/api", "description": "Laravel development server" },
-    { "url": "http://praktikum-api.test/api", "description": "Laravel Herd local domain" }
+    {
+      "url": "http://127.0.0.1:8000/api",
+      "description": "Laravel development server (native PHP or Docker)"
+    }
   ],
   "tags": [
-    { "name": "Authentication", "description": "Registrasi, login, profil, dan logout menggunakan Sanctum." },
-    { "name": "Blog", "description": "Operasi BREAD pada data blog." }
+    {
+      "name": "Authentication",
+      "description": "Registrasi, login, profil, dan logout menggunakan Sanctum."
+    },
+    {
+      "name": "Blog",
+      "description": "Operasi BREAD pada data blog."
+    }
   ],
   "paths": {
     "/register": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Register user baru",
         "description": "Membuat akun dengan role user. Role tidak dapat ditentukan melalui request publik.",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RegisterRequest" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
             "description": "User berhasil didaftarkan.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RegisterResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
           },
-          "422": { "$ref": "#/components/responses/ValidationError" }
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
         }
       }
     },
     "/login": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Login dan membuat token Sanctum",
         "description": "Mode menentukan abilities token untuk demonstrasi praktikum. Jika mode tidak dikirim, nilai default adalah read.",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
             "description": "Login berhasil dan token diterbitkan.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TokenResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
           },
-          "422": { "$ref": "#/components/responses/ValidationError" }
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
         }
       }
     },
     "/logout": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Logout dan mencabut token saat ini",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Token yang digunakan pada request berhasil dicabut.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessageResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
         }
       }
     },
     "/profile": {
       "get": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Melihat profil user yang sedang login",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Profil user berhasil ditampilkan.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProfileResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                }
+              }
+            }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
         }
       }
     },
     "/blogs": {
       "get": {
-        "tags": ["Blog"],
+        "tags": [
+          "Blog"
+        ],
         "summary": "B (Browse) - Menampilkan semua blog",
         "description": "Memerlukan ability blogs:read. Daftar menampilkan informasi singkat pemilik setiap blog.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "x-required-ability": "blogs:read",
         "responses": {
           "200": {
@@ -92,36 +166,71 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["data"],
+                  "required": [
+                    "data"
+                  ],
                   "properties": {
-                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/BlogListItem" } }
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BlogListItem"
+                      }
+                    }
                   }
                 }
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
         }
       },
       "post": {
-        "tags": ["Blog"],
+        "tags": [
+          "Blog"
+        ],
         "summary": "A (Add) - Menambahkan blog",
         "description": "Memerlukan ability blogs:create. user_id selalu diambil dari user yang sedang login, bukan dari body request.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "x-required-ability": "blogs:create",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BlogInput" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogInput"
+              }
+            }
+          }
         },
         "responses": {
           "201": {
             "description": "Blog berhasil ditambahkan.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BlogMutationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogMutationResponse"
+                }
+              }
+            }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "422": { "$ref": "#/components/responses/ValidationError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
         }
       }
     },
@@ -132,61 +241,126 @@
           "in": "path",
           "required": true,
           "description": "ID blog berupa bilangan bulat.",
-          "schema": { "type": "integer", "minimum": 1 },
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
           "example": 1
         }
       ],
       "get": {
-        "tags": ["Blog"],
+        "tags": [
+          "Blog"
+        ],
         "summary": "R (Read) - Melihat detail blog",
         "description": "Memerlukan ability blogs:read dan hanya pemilik blog yang dapat melihat detailnya.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "x-required-ability": "blogs:read",
         "responses": {
           "200": {
             "description": "Detail blog berhasil ditampilkan.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BlogMutationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogMutationResponse"
+                }
+              }
+            }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       },
       "put": {
-        "tags": ["Blog"],
+        "tags": [
+          "Blog"
+        ],
         "summary": "E (Edit) - Mengubah blog",
         "description": "Memerlukan ability blogs:update. Hanya pemilik blog yang dapat mengubah data. Kirim minimal satu field title atau content.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "x-required-ability": "blogs:update",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BlogUpdate" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogUpdate"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
             "description": "Blog berhasil diubah.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BlogMutationResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlogMutationResponse"
+                }
+              }
+            }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" },
-          "422": { "$ref": "#/components/responses/ValidationError" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
         }
       },
       "delete": {
-        "tags": ["Blog"],
+        "tags": [
+          "Blog"
+        ],
         "summary": "D (Delete) - Menghapus blog",
         "description": "Memerlukan ability blogs:delete. Hanya pemilik blog yang dapat menghapusnya.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "x-required-ability": "blogs:delete",
         "responses": {
           "200": {
             "description": "Blog berhasil dihapus.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "404": { "$ref": "#/components/responses/NotFound" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
         }
       }
     }
@@ -202,34 +376,91 @@
     "schemas": {
       "User": {
         "type": "object",
-        "required": ["id", "name", "email", "role"],
+        "required": [
+          "id",
+          "name",
+          "email",
+          "role"
+        ],
         "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "name": { "type": "string", "example": "Jeni" },
-          "email": { "type": "string", "format": "email", "example": "jeni@example.com" },
-          "role": { "type": "string", "example": "user" },
-          "created_at": { "type": "string", "format": "date-time", "nullable": true }
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Jeni"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "jeni@example.com"
+          },
+          "role": {
+            "type": "string",
+            "example": "user"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
         }
       },
       "RegisterRequest": {
         "type": "object",
-        "required": ["name", "email", "password", "password_confirmation"],
+        "required": [
+          "name",
+          "email",
+          "password",
+          "password_confirmation"
+        ],
         "properties": {
-          "name": { "type": "string", "maxLength": 255, "example": "Jeni" },
-          "email": { "type": "string", "format": "email", "example": "jeni@example.com" },
-          "password": { "type": "string", "format": "password", "minLength": 8 },
-          "password_confirmation": { "type": "string", "format": "password" }
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Jeni"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "jeni@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8
+          },
+          "password_confirmation": {
+            "type": "string",
+            "format": "password"
+          }
         }
       },
       "LoginRequest": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
-          "email": { "type": "string", "format": "email", "example": "jeni@example.com" },
-          "password": { "type": "string", "format": "password" },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "jeni@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
           "mode": {
             "type": "string",
-            "enum": ["read", "edit", "delete", "manage"],
+            "enum": [
+              "read",
+              "edit",
+              "delete",
+              "manage"
+            ],
             "default": "read",
             "description": "Mode token untuk menentukan daftar abilities."
           }
@@ -237,129 +468,292 @@
       },
       "TokenResponse": {
         "type": "object",
-        "required": ["token_type", "token", "mode", "abilities"],
+        "required": [
+          "token_type",
+          "token",
+          "mode",
+          "abilities"
+        ],
         "properties": {
-          "token_type": { "type": "string", "example": "Bearer" },
-          "token": { "type": "string", "example": "1|sanctum-personal-access-token" },
-          "mode": { "type": "string", "example": "manage" },
+          "token_type": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "token": {
+            "type": "string",
+            "example": "1|sanctum-personal-access-token"
+          },
+          "mode": {
+            "type": "string",
+            "example": "manage"
+          },
           "abilities": {
             "type": "array",
-            "items": { "type": "string" },
-            "example": ["blogs:read", "blogs:update", "blogs:create", "blogs:delete"]
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "blogs:read",
+              "blogs:update",
+              "blogs:create",
+              "blogs:delete"
+            ]
           }
         }
       },
       "ProfileResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string", "example": "User Jeni" },
-          "user": { "$ref": "#/components/schemas/User" }
+          "message": {
+            "type": "string",
+            "example": "User Jeni"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
         }
       },
       "Blog": {
         "type": "object",
-        "required": ["id", "title", "content", "user_id", "created_at", "updated_at"],
+        "required": [
+          "id",
+          "title",
+          "content",
+          "user_id",
+          "created_at",
+          "updated_at"
+        ],
         "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "title": { "type": "string", "example": "Belajar Laravel" },
-          "content": { "type": "string", "nullable": true, "example": "Membuat REST API sederhana." },
-          "user_id": { "type": "integer", "nullable": true, "example": 1 },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" },
-          "user": { "allOf": [{ "$ref": "#/components/schemas/BlogOwner" }], "nullable": true }
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Belajar Laravel"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true,
+            "example": "Membuat REST API sederhana."
+          },
+          "user_id": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlogOwner"
+              }
+            ],
+            "nullable": true
+          }
         }
       },
       "BlogOwner": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "name": { "type": "string", "example": "Jeni" }
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Jeni"
+          }
         }
       },
       "BlogListItem": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "title": { "type": "string", "example": "Belajar Laravel" },
-          "content": { "type": "string", "nullable": true },
-          "date": { "type": "string", "nullable": true, "example": "2 hours ago" },
-          "user": { "allOf": [{ "$ref": "#/components/schemas/BlogOwner" }], "nullable": true }
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Belajar Laravel"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "nullable": true,
+            "example": "2 hours ago"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlogOwner"
+              }
+            ],
+            "nullable": true
+          }
         }
       },
       "BlogInput": {
         "type": "object",
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "properties": {
-          "title": { "type": "string", "maxLength": 255, "example": "Belajar Laravel" },
-          "content": { "type": "string", "nullable": true, "example": "Membuat REST API sederhana." }
+          "title": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Belajar Laravel"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true,
+            "example": "Membuat REST API sederhana."
+          }
         }
       },
       "BlogUpdate": {
         "type": "object",
         "minProperties": 1,
         "properties": {
-          "title": { "type": "string", "maxLength": 255, "example": "Judul blog yang diperbarui" },
-          "content": { "type": "string", "nullable": true, "example": "Isi blog yang diperbarui." }
+          "title": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Judul blog yang diperbarui"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true,
+            "example": "Isi blog yang diperbarui."
+          }
         }
       },
       "RegisterResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string", "example": "User registered successfully" },
-          "user": { "$ref": "#/components/schemas/User" }
+          "message": {
+            "type": "string",
+            "example": "User registered successfully"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
         }
       },
       "BlogMutationResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string" },
-          "data": { "$ref": "#/components/schemas/Blog" }
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Blog"
+          }
         }
       },
       "DeleteResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string", "example": "Blog berhasil dihapus." },
-          "data": { "type": "object", "properties": { "id": { "type": "integer", "example": 1 } } }
+          "message": {
+            "type": "string",
+            "example": "Blog berhasil dihapus."
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
         }
       },
       "MessageResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string", "example": "Logout berhasil." }
+          "message": {
+            "type": "string",
+            "example": "Logout berhasil."
+          }
         }
       },
       "ValidationError": {
         "type": "object",
         "properties": {
-          "message": { "type": "string", "example": "The given data was invalid." },
+          "message": {
+            "type": "string",
+            "example": "The given data was invalid."
+          },
           "errors": {
             "type": "object",
-            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         }
       },
       "ErrorResponse": {
         "type": "object",
-        "properties": { "message": { "type": "string" } }
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
       }
     },
     "responses": {
       "Unauthorized": {
         "description": "Token tidak ada atau tidak valid.",
-        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
       },
       "Forbidden": {
         "description": "Token tidak memiliki ability yang dibutuhkan atau user bukan pemilik blog.",
-        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
       },
       "NotFound": {
         "description": "Data blog tidak ditemukan.",
-        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
       },
       "ValidationError": {
         "description": "Data request tidak memenuhi validasi.",
-        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } } }
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
       }
     }
   }

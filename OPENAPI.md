@@ -4,7 +4,30 @@ Dokumen ini menjelaskan kontrak API final untuk aplikasi Blog API. Spesifikasi l
 
 ## 1. Menjalankan aplikasi Laravel
 
-Dari folder utama project:
+Semua endpoint Laravel berada di bawah prefix /api dan menggunakan base URL http://127.0.0.1:8000/api.
+
+### Menggunakan Docker Desktop di Windows
+
+Metode ini tidak membutuhkan PHP, Composer, Herd, atau ServBay yang terpasang di Windows.
+
+1. Buka Docker Desktop dan tunggu sampai Docker Engine berstatus **Running**.
+2. Dari PowerShell pada folder utama repository, jalankan:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start-laravel.ps1
+~~~
+
+Script akan membangun image PHP 8.4, menyiapkan file .env dan database SQLite, memasang dependency Composer, membuat application key bila belum ada, menjalankan migration, dan menyalakan server pada port 8000.
+
+Untuk menghentikan server:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\stop-laravel.ps1
+~~~
+
+### Menggunakan PHP lokal
+
+Jika PHP 8.3+ dan Composer 2 sudah tersedia:
 
 ~~~bash
 composer install
@@ -13,9 +36,7 @@ php artisan migrate --seed
 php artisan serve
 ~~~
 
-Server lokal biasanya berjalan di `http://127.0.0.1:8000`. Semua endpoint Laravel berada di bawah prefix `/api`.
-
-Jika memakai SQLite dan file database belum tersedia, buat file `database/database.sqlite` terlebih dahulu dan pastikan `DB_CONNECTION=sqlite` pada `.env`. Untuk MySQL/MariaDB, isi host, port, nama database, username, dan password sesuai database lokal.
+Jika memakai SQLite dan file database belum tersedia, buat file database/database.sqlite terlebih dahulu dan pastikan DB_CONNECTION=sqlite pada .env. Untuk MySQL/MariaDB, isi host, port, nama database, username, dan password sesuai konfigurasi lokal.
 
 ## 2. Daftar endpoint
 
@@ -121,10 +142,16 @@ Laravel Scramble juga menyediakan dokumentasi interaktif dari aplikasi yang seda
 
 ## 6. Pengujian otomatis
 
-Jalankan seluruh test dengan:
+Jalankan seluruh test dengan PHP lokal:
 
 ~~~bash
 php artisan test
+~~~
+
+Jika Laravel dijalankan melalui Docker:
+
+~~~powershell
+docker exec -it praktikum-interoperabilitas-laravel php artisan test
 ~~~
 
 Test mencakup registrasi, validasi login, mode abilities, profile, logout, BREAD, kepemilikan blog, dan penolakan akses ketika token tidak memiliki ability yang diperlukan.

@@ -15,70 +15,96 @@ Project praktikum REST API menggunakan Laravel, Sanctum, OpenAPI, dan Express.js
 
 ## Persyaratan
 
-- PHP 8.3 atau lebih baru.
-- Composer 2.
-- Database SQLite atau MySQL/MariaDB.
+- PHP 8.3 atau lebih baru dan Composer 2 untuk menjalankan Laravel secara langsung; atau Docker Desktop untuk menjalankan Laravel tanpa memasang PHP di Windows.
+- Database SQLite (sudah disiapkan pada metode Docker) atau MySQL/MariaDB untuk konfigurasi lokal.
 - Node.js 24 atau lebih baru untuk Express dan Prism.
-- Docker (opsional, untuk menjalankan Express API dalam container).
+- Docker Engine/Docker Desktop untuk metode Laravel berbasis container dan opsi container Express.
+
+Laravel Herd dan ServBay bukan persyaratan wajib. Jika PHP lokal tidak tersedia atau diblokir kebijakan Windows, gunakan metode Docker di bawah.
 
 ## Menjalankan Laravel API
 
-1. Clone repository (jika belum ada di komputer):
+Pilih salah satu metode berikut. Herd dan ServBay tidak wajib digunakan.
 
-~~~bash
-git clone https://github.com/jenoyyy/praktikum-interoperabilitas-jeni.git
-cd praktikum-interoperabilitas-jeni
+### Opsi A — Docker Desktop (Windows, tanpa PHP lokal)
+
+Metode ini disediakan untuk komputer yang belum memiliki PHP/Composer atau yang memblokir executable PHP lokal.
+
+1. Pasang dan buka Docker Desktop. Tunggu sampai Docker Engine berstatus **Running**.
+2. Buka PowerShell di folder utama repository.
+3. Jalankan script:
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start-laravel.ps1
 ~~~
 
-Jika repository sudah pernah di-clone, pastikan menggunakan branch utama dan ambil perubahan terbaru:
+Pada penggunaan pertama, script akan membangun image PHP 8.4, membuat file .env jika belum ada, menyiapkan SQLite, memasang dependency Composer, membuat application key jika belum tersedia, menjalankan migration, lalu menyalakan server Laravel.
 
-~~~bash
-git switch main
-git pull origin main
+Base URL API: http://127.0.0.1:8000/api.
+
+Untuk melihat log server:
+
+~~~powershell
+docker logs -f praktikum-interoperabilitas-laravel
 ~~~
 
-2. Instal dependency:
+Untuk menjalankan pengujian Laravel di dalam container:
+
+~~~powershell
+docker exec -it praktikum-interoperabilitas-laravel php artisan test
+~~~
+
+Untuk menghentikan dan menghapus container (file project, .env, dan database lokal tetap berada di folder repository):
+
+~~~powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\stop-laravel.ps1
+~~~
+
+Script menggunakan docker run langsung, sehingga Docker Compose tidak diperlukan.
+
+### Opsi B — PHP dan Composer lokal
+
+Jika PHP 8.3+ dan Composer 2 sudah dapat dijalankan di Windows:
+
+1. Instal dependency:
 
 ~~~bash
 composer install
 ~~~
 
-3. Salin file environment. Pada Windows PowerShell:
+2. Salin file environment jika belum tersedia:
 
 ~~~powershell
 Copy-Item .env.example .env
 ~~~
 
-4. Buat application key:
+3. Buat application key:
 
 ~~~bash
 php artisan key:generate
 ~~~
 
-5. Atur koneksi database di `.env`.
+4. Atur koneksi database pada .env. Untuk SQLite, gunakan DB_CONNECTION=sqlite dan buat file database/database.sqlite jika belum tersedia. Untuk MySQL/MariaDB, isi host, port, nama database, username, dan password sesuai konfigurasi lokal.
 
-Untuk SQLite, gunakan `DB_CONNECTION=sqlite`. Jika file database belum ada, buat `database/database.sqlite` terlebih dahulu. Untuk MySQL/MariaDB, isi host, port, nama database, username, dan password sesuai konfigurasi lokal.
-
-6. Jalankan migration dan seeder:
+5. Jalankan migration dan seeder:
 
 ~~~bash
 php artisan migrate --seed
 ~~~
 
-7. Jalankan server:
+6. Jalankan server:
 
 ~~~bash
 php artisan serve
 ~~~
 
-Base URL API: `http://127.0.0.1:8000/api`.
-
+Base URL API: http://127.0.0.1:8000/api.
 ## Dokumentasi dan pengujian Laravel
 
 - OpenAPI: lihat file [OPENAPI.md](OPENAPI.md) dan [openapi.json](openapi.json).
 - Dokumentasi interaktif Scramble: `http://127.0.0.1:8000/docs/api`.
-- Daftar route: `php artisan route:list --path=api`.
-- Jalankan test Laravel: `php artisan test`.
+- Daftar route: php artisan route:list --path=api; jika menggunakan Docker, jalankan docker exec -it praktikum-interoperabilitas-laravel php artisan route:list --path=api.
+- Jalankan test Laravel: php artisan test; jika menggunakan Docker, jalankan docker exec -it praktikum-interoperabilitas-laravel php artisan test.
 
 ## Pengujian otomatis Node.js dan OpenAPI
 
