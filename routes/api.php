@@ -1,81 +1,33 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BlogController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Blog;
 
-// // fungsi untuk mendapatkan user, but need authentikasi
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:api');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-// BREAD
-// B = BROWSE (menampilkan list data)
-// R = READ (menampilkan detail data)
-// E = EDIT (mengubah data)
-// A = ADD (menambahkan data)
-// D = DELETE (menghapus data)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/profile', [AuthController::class, 'profile']);
 
+    // B (Browse) and R (Read).
+    Route::middleware('abilities:blogs:read')->group(function () {
+        Route::get('/blogs', [BlogController::class, 'browse']);
+        Route::get('/blog/{id}', [BlogController::class, 'read'])->whereNumber('id');
+    });
 
-// blogs : untuk menampikan semua data blogs (GET)
-// B (Browse): MENAMPILKAN LISTS DARIPADA BLOG YANG ADA DI DATABASE
-Route::get('/blogs', function() {
-    $blogs = Blog::get();
+    // A (Add).
+    Route::post('/blogs', [BlogController::class, 'add'])
+        ->middleware('abilities:blogs:create');
 
-    return response()->json([
-        'data' => $blogs
-    ]);
-});
+    // E (Edit).
+    Route::put('/blog/{id}', [BlogController::class, 'edit'])
+        ->middleware('abilities:blogs:update')
+        ->whereNumber('id');
 
-// blog/{id} : untuk menampilkan data blog berdasarkan id (GET)
-// R (Read): MENAMPILKAN DETAIL DATA BLOG BERDASARKAN ID
-Route::get('/blog/{id}', function($id) {
-    $blog = Blog::findOrFail($id);
-
-    return response()->json([
-        'message' => "Detail blog berhasil ditampilkan",
-        'data' => $blog
-    ]);
-});
-
-// blog/{id} : untuk mengupdate data blog berdasarkan id (PUT)
-// E (Edit): MENGUBAH DATA BLOG BERDASARKAN ID
-Route::put('/blog/{id}', function($id) {
-    $blog = Blog::findOrFail($id);
-
-    $blog->update([
-        'title' => request()->get('title'),
-        'content' => request()->get('content'),
-    ]);
-
-    return response()->json([
-        'message' => "Blog berhasil diubah",
-    ]);
-});
-
-
-// blogs : untuk menambahkan data blog baru (POST)
-// A (Add): MENAMBAHKAN DATA BLOG BARU KE DALAM DATABASE
-Route::post('/blogs', function() {
-    $blog = Blog::create([
-        'title' => request()->get('title'),
-        'content' => request()->get('content'),
-    ]);
-
-    return response()->json([
-        'message' => "Blog berhasil ditambahkan",
-        'data' => $blog
-    ]);
-});
-
-// blog/{id} : untuk menghapus data blog berdasarkan id (DELETE)
-// D (Delete): MENGHAPUS DATA BLOG BERDASARKAN ID
-Route::delete('/blog/{id}', function($id) {
-    $blog = Blog::findOrFail($id);
-
-    $blog->delete();
-
-    return response()->json([
-        'message' => "Blog berhasil dihapus",
-    ]);
+    // D (Delete).
+    Route::delete('/blog/{id}', [BlogController::class, 'delete'])
+        ->middleware('abilities:blogs:delete')
+        ->whereNumber('id');
 });

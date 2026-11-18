@@ -1,41 +1,16 @@
-const express = require('express');
+import express from 'express';
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
 const products = [
-    {
-        id: "P001",
-        nama: "Laptop",
-        harga: 7500000,
-        stok: 10
-    },
-    {
-        id: "P002",
-        nama: "Mouse",
-        harga: 150000,
-        stok: 20
-    },
-    {
-        id: "P003",
-        nama: "Keyboard",
-        harga: 300000,
-        stok: 15
-    },
-    {
-        id: "P004",
-        nama: "Monitor",
-        harga: 2000000,
-        stok: 8
-    },
-    {
-        id: "P005",
-        nama: "Headset",
-        harga: 450000,
-        stok: 12
-    }
+    { id: 'P001', nama: 'Laptop', harga: 7500000, stok: 10 },
+    { id: 'P002', nama: 'Mouse', harga: 150000, stok: 20 },
+    { id: 'P003', nama: 'Keyboard', harga: 300000, stok: 15 },
+    { id: 'P004', nama: 'Monitor', harga: 2000000, stok: 8 },
+    { id: 'P005', nama: 'Headset', harga: 450000, stok: 12 }
 ];
 
 app.get('/', (req, res) => {
@@ -49,56 +24,115 @@ app.get('/produk', (req, res) => {
 });
 
 app.get('/produk/:id', (req, res) => {
-    const product = products.find(p => p.id === req.params.id);
+    const product = products.find((item) => item.id === req.params.id);
 
     if (!product) {
-        return res.status(404).json({
-            message: 'Produk tidak ditemukan'
-        });
+        return res.status(404).json({ message: 'Produk tidak ditemukan' });
     }
 
-    res.json(product);
+    return res.json(product);
 });
 
 app.post('/produk', (req, res) => {
-    const newProduct = req.body;
+    const { id, nama, harga, stok } = req.body ?? {};
+    const numericPrice = Number(harga);
+    const numericStock = Number(stok);
+
+    if (
+        typeof id !== 'string' || !id.trim() ||
+        typeof nama !== 'string' || !nama.trim() ||
+        !Number.isFinite(numericPrice) || numericPrice < 0 ||
+        !Number.isInteger(numericStock) || numericStock < 0
+    ) {
+        return res.status(422).json({
+            message: 'Field id, nama, harga, dan stok wajib diisi dengan format yang benar.'
+        });
+    }
+
+    if (products.some((item) => item.id === id.trim())) {
+        return res.status(409).json({ message: 'ID produk sudah digunakan.' });
+    }
+
+    const newProduct = {
+        id: id.trim(),
+        nama: nama.trim(),
+        harga: numericPrice,
+        stok: numericStock
+    };
 
     products.push(newProduct);
 
-    res.status(201).json(newProduct);
+    return res.status(201).json({
+        message: 'Produk berhasil ditambahkan.',
+        data: newProduct
+    });
 });
 
 app.patch('/produk/:id', (req, res) => {
-    const product = products.find(p => p.id === req.params.id);
+    const product = products.find((item) => item.id === req.params.id);
 
     if (!product) {
-        return res.status(404).json({
-            message: 'Produk tidak ditemukan'
+        return res.status(404).json({ message: 'Produk tidak ditemukan' });
+    }
+
+    const body = req.body ?? {};
+    const allowedFields = ['nama', 'harga', 'stok'];
+    const suppliedFields = Object.keys(body);
+
+    if (
+        suppliedFields.length === 0 ||
+        suppliedFields.some((field) => !allowedFields.includes(field))
+    ) {
+        return res.status(422).json({
+            message: 'Kirim minimal satu field yang valid: nama, harga, atau stok.'
         });
     }
 
-    Object.assign(product, req.body);
+    const updates = {};
 
-    res.json(product);
+    if (Object.hasOwn(body, 'nama')) {
+        if (typeof body.nama !== 'string' || !body.nama.trim()) {
+            return res.status(422).json({ message: 'Nama harus berupa teks dan tidak boleh kosong.' });
+        }
+        updates.nama = body.nama.trim();
+    }
+
+    if (Object.hasOwn(body, 'harga')) {
+        const price = Number(body.harga);
+        if (!Number.isFinite(price) || price < 0) {
+            return res.status(422).json({ message: 'Harga harus berupa angka nol atau lebih.' });
+        }
+        updates.harga = price;
+    }
+
+    if (Object.hasOwn(body, 'stok')) {
+        const stock = Number(body.stok);
+        if (!Number.isInteger(stock) || stock < 0) {
+            return res.status(422).json({ message: 'Stok harus berupa bilangan bulat nol atau lebih.' });
+        }
+        updates.stok = stock;
+    }
+
+    Object.assign(product, updates);
+
+    return res.json({ message: 'Produk berhasil diubah.', data: product });
 });
 
 app.delete('/produk/:id', (req, res) => {
-    const index = products.findIndex(p => p.id === req.params.id);
+    const index = products.findIndex((item) => item.id === req.params.id);
 
     if (index === -1) {
-        return res.status(404).json({
-            message: 'Produk tidak ditemukan'
-        });
+        return res.status(404).json({ message: 'Produk tidak ditemukan' });
     }
 
-    const deletedProduct = products.splice(index, 1);
+    const [deletedProduct] = products.splice(index, 1);
 
-    res.json({
+    return res.json({
         message: 'Produk berhasil dihapus',
-        data: deletedProduct[0]
+        data: deletedProduct
     });
 });
 
 app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
+    console.log('Server berjalan di http://localhost:' + PORT);
 });
