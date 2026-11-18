@@ -6,7 +6,9 @@
     "build": "vite build",
     "dev": "vite",
     "start:api": "node server.js",
-    "dev:api": "node --watch server.js"
+    "dev:api": "node --watch server.js",
+    "test": "node --test tests/node",
+    "test:api": "node --test tests/node"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

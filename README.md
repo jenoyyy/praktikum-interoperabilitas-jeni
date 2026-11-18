@@ -23,10 +23,18 @@ Project praktikum REST API menggunakan Laravel, Sanctum, OpenAPI, dan Express.js
 
 ## Menjalankan Laravel API
 
-1. Checkout branch pengerjaan:
+1. Clone repository (jika belum ada di komputer):
 
 ~~~bash
-git checkout feature/complete-api-practicum
+git clone https://github.com/jenoyyy/praktikum-interoperabilitas-jeni.git
+cd praktikum-interoperabilitas-jeni
+~~~
+
+Jika repository sudah pernah di-clone, pastikan menggunakan branch utama dan ambil perubahan terbaru:
+
+~~~bash
+git switch main
+git pull origin main
 ~~~
 
 2. Instal dependency:
